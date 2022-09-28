@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace RestaurantAPI5.Controllers
-{
+{ 
     [ApiController] 
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
