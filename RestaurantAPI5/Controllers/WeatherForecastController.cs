@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace RestaurantAPI5.Controllers
 {
-    [ApiController]
+    [ApiController] 
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {
