@@ -49,18 +49,16 @@ namespace RestaurantAPI5.Controllers
             return NotFound($"Hello {name}");
         }
         [HttpPost("generate")]
-        public ActionResult<int> Temperature([FromHeader] int returnedResultsCount, int minTemp, int maxTemp)
+        public ActionResult<IEnumerable<WeatherForecast>> Generate([FromQuery] int returnedResultsCount, 
+            [FromBody]TemperatureRequest request)
         {
-            var result = _service.Get(returnedResultsCount, minTemp, maxTemp);
+            if (returnedResultsCount < 0 || request.Max < request.Min)
+            {
+                return BadRequest();
+            }
 
-            if (returnedResultsCount > 0 && minTemp > 0 && maxTemp > 0 && minTemp > maxTemp)
-            {
-                return Ok(result);
-            }
-            else
-            {
-                return BadRequest(result);
-            }
+            var result = _service.Get(returnedResultsCount, request.Min, request.Max);
+            return Ok(result);
         }
     }
 }
