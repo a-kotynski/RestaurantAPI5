@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System;
+using Microsoft.AspNetCore.Mvc;
 
 namespace RestaurantAPI5
 {
@@ -15,13 +16,20 @@ namespace RestaurantAPI5
         public IEnumerable<WeatherForecast> Get(int returnedResultsCount, int minTemp, int maxTemp)// int returnedResults, int minTemp, int maxTemp
         {
             var rng = new Random();
-            return Enumerable.Range(1, returnedResultsCount).Select(index => new WeatherForecast
+            try
             {
-                Date = DateTime.Now.AddDays(index),
-                TemperatureC = rng.Next(minTemp, maxTemp + 1),
-                Summary = Summaries[rng.Next(Summaries.Length)]
-            })
-            .ToArray();
+                return Enumerable.Range(1, returnedResultsCount).Select(index => new WeatherForecast
+                {
+                    Date = DateTime.Now.AddDays(index),
+                    TemperatureC = rng.Next(minTemp, maxTemp + 1),
+                    Summary = Summaries[rng.Next(Summaries.Length)]
+                })
+                    .ToArray();
+            }
+            catch (Exception ex)
+            {
+                throw; 
+            }
         }
     }
 }
