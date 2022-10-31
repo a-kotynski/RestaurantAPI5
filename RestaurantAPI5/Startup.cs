@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -7,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using RestaurantAPI5.Entities;
+using RestaurantAPI5.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,10 +30,11 @@ namespace RestaurantAPI5
         {
             //services.AddSingleton<>(); // registering dependencies with AddSingleton<>() we're sure a certain dependecy has been created only once during 
             //services.AddScoped<>; //tl;dr: one request = one instance of a service // registering dependecies with different durations of objects; each object will be created anew for each requst sent by a client
-            services.AddTransient<IWeatherForecastService, WeatherForecastService>(); // same as scoped, but objects are created each time we call them through a constructor
             services.AddControllers();
             services.AddDbContext<RestaurantDbContext>();
             services.AddScoped<RestaurantSeeder>();
+            services.AddAutoMapper(this.GetType().Assembly);
+            services.AddScoped<IRestaurantService, RestaurantService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
