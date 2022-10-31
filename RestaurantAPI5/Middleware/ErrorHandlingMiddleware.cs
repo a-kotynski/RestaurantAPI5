@@ -25,7 +25,7 @@ namespace RestaurantAPI5.Middleware
             catch (NotFoundException notFoundException)
             {
                 context.Response.StatusCode = 404;
-                await context.Response.WriteAsJsonAsync(notFoundException.Message);
+                await context.Response.WriteAsync(notFoundException.Message);
             }
             catch (Exception e) // access to logger is created by injection in this classe's ctor
             {

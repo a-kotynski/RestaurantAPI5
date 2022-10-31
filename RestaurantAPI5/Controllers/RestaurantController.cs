@@ -12,6 +12,7 @@ namespace RestaurantAPI5.Controllers
 {
     //mapping requests with specific paths:
     [Route("api/restaurant")]
+    [ApiController]
     public class RestaurantController : ControllerBase // ControllerBase allows access to request and answer context
     {
 
@@ -26,16 +27,7 @@ namespace RestaurantAPI5.Controllers
         [HttpPut("{id}")]
         public ActionResult UpdateRestaurant([FromBody] UpdateRestaurantDto dto, [FromRoute]int id)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var isUpdated = RestaurantService.Update(id, dto);
-            if (!isUpdated)
-            {
-                return NotFound();
-            }
+            RestaurantService.Update(id, dto);
             return Ok();
         }
 
@@ -43,25 +35,14 @@ namespace RestaurantAPI5.Controllers
         [HttpDelete("{id}")]
         public ActionResult Delete([FromRoute] int id)
         {
-            var isDeleted = RestaurantService.Delete(id);
-
-            if (isDeleted)
-            {
-                return NoContent();
-            }
-
-            return NotFound();
+            RestaurantService.Delete(id);
+            return NoContent();
         }
 
 
         [HttpPost]
         public ActionResult CreateRestaurant([FromBody] CreateRestaurantDto dto)
         {
-            if (!ModelState.IsValid) // ModelState represents state of attribute validation - [Required] in CreateRestaurantDto.cs
-            {
-                return BadRequest(ModelState);
-            }
-
             var id = RestaurantService.Create(dto);
             return Created($"/api/restaurant/{id}", null);
         }
@@ -82,12 +63,6 @@ namespace RestaurantAPI5.Controllers
         public ActionResult<RestaurantDto> Get([FromRoute] int id)
         {
             var restaurant = RestaurantService.GetById(id);
-
-            if (restaurant is null)
-            {
-                return NotFound();
-            }
-
             return Ok(restaurant);
         }
     }

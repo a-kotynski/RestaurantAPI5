@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using RestaurantAPI5.Exceptions;
 
 namespace RestaurantAPI5.Services
 {
@@ -29,25 +30,23 @@ namespace RestaurantAPI5.Services
         public ILogger _logger;
 
 
-        public bool Update(int id, UpdateRestaurantDto dto)
+        public void Update(int id, UpdateRestaurantDto dto)
         {
-            // return type is bool, because tells if a given resource was found on the server and properly modified
             var restaurant = DbContext
                 .Restaurants
                 .FirstOrDefault(r => r.Id == id);
 
-            if (restaurant is null) return false;
+            if (restaurant is null)
+                throw new NotFoundException("Restaurant not found");
 
             restaurant.Name = dto.Name;
             restaurant.Description = dto.Description;
             restaurant.HasDelivery = dto.HasDelivery;
 
             DbContext.SaveChanges();
-
-            return true;
         }
 
-        public bool Delete(int id)
+        public void Delete(int id)
         {
             _logger.LogError($"Restaurant with id: {id} DELETE action invoked");
 
@@ -55,11 +54,10 @@ namespace RestaurantAPI5.Services
                 .Restaurants
                 .FirstOrDefault(r => r.Id == id);
 
-            if (restaurant is null) return false;
+            if (restaurant is null)
+                throw new NotFoundException("Restaurant not found");
             DbContext.Restaurants.Remove(restaurant);
             DbContext.SaveChanges();
-
-            return true;
         }
 
         public RestaurantDto GetById(int id)
@@ -70,7 +68,8 @@ namespace RestaurantAPI5.Services
                 .Include(r => r.Dishes)
                 .FirstOrDefault(r => r.Id == id);
 
-            if (restaurant is null) return null;
+            if (restaurant is null)
+                throw new NotFoundException("Restaurant not found");
 
             var result = Mapper.Map<RestaurantDto>(restaurant);
             return result;
