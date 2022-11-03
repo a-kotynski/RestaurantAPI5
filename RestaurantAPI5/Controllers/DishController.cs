@@ -9,15 +9,15 @@ namespace RestaurantAPI5.Controllers
     [ApiController]
     public class DishController : ControllerBase
     {
-        private readonly IDishService DishService;
         public DishController(IDishService dishService)
         {
             DishService = dishService;
         }
+        private readonly IDishService DishService;
 
 
         [HttpPost]
-        public ActionResult Post([FromRoute]int restaurantId, CreateDishDto dto)
+        public ActionResult Post([FromRoute]int restaurantId, [FromBody] CreateDishDto dto)
         {
             var newDishId = DishService.Create(restaurantId, dto);
 

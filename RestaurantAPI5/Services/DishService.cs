@@ -13,14 +13,15 @@ namespace RestaurantAPI5.Services
     }
     public class DishService : IDishService
     {
-        private readonly RestaurantDbContext Context;
-        private readonly IMapper Mapper;
 
         public DishService(RestaurantDbContext context, IMapper mapper)
         {
             Context = context;
             Mapper = mapper;
         }
+
+        private readonly RestaurantDbContext Context;
+        private readonly IMapper Mapper;
 
 
         public int Create(int restaurantId, CreateDishDto dto)
@@ -30,6 +31,8 @@ namespace RestaurantAPI5.Services
                 throw new NotFoundException("Restaurant not found");
 
             var dishEntity = Mapper.Map<Dish>(dto);
+
+            dishEntity.RestaurantId = restaurantId;
 
             Context.Dishes.Add(dishEntity);
             Context.SaveChanges();
