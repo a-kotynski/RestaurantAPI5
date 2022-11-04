@@ -13,6 +13,7 @@ namespace RestaurantAPI5.Services
         int Create(int restaurantId, CreateDishDto dto);
         DishDto GetById(int restaurantId, int dishId);
         List<DishDto> GetAll(int restaurantId);
+        void RemoveAll(int restaurantId);
     }
     public class DishService : IDishService
     {
@@ -29,9 +30,7 @@ namespace RestaurantAPI5.Services
 
         public int Create(int restaurantId, CreateDishDto dto)
         {
-            var restaurant = Context.Restaurants.FirstOrDefault(r => r.Id == restaurantId);
-            if (restaurant is null)
-                throw new NotFoundException("Restaurant not found");
+            var restaurant = GetRestaurantById(restaurantId);
 
             var dishEntity = Mapper.Map<Dish>(dto);
 
@@ -45,10 +44,7 @@ namespace RestaurantAPI5.Services
 
         public DishDto GetById(int restaurantId, int dishId)
         {
-            var restaurant = Context.Restaurants.FirstOrDefault(r => r.Id == restaurantId);
-            if (restaurant is null)
-                throw new NotFoundException("Restaurant not found");
-
+            var restaurant = GetRestaurantById(restaurantId);
 
             var dish = Context.Dishes.FirstOrDefault(d => d.Id == dishId);
             if (dish is null || dish.RestaurantId != restaurantId)
@@ -61,16 +57,32 @@ namespace RestaurantAPI5.Services
         }
         public List<DishDto> GetAll(int restaurantId)
         {
+
+            var restaurant = GetRestaurantById(restaurantId);
+            var dishDtos = Mapper.Map<List<DishDto>>(restaurant.Dishes);
+
+            return dishDtos;
+        }
+
+        public void RemoveAll(int restaurantId)
+        {
+            var restaurant = GetRestaurantById(restaurantId);
+
+            Context.RemoveRange(restaurant.Dishes);
+            Context.SaveChanges();
+        }
+
+        private Restaurant GetRestaurantById(int restaurantId)
+        {
             var restaurant = Context
                 .Restaurants
                 .Include(r => r.Dishes)
                 .FirstOrDefault(r => r.Id == restaurantId);
+
             if (restaurant is null)
                 throw new NotFoundException("Restaurant not found");
 
-            var dishDtos = Mapper.Map<List<DishDto>>(restaurant.Dishes);
-
-            return dishDtos;
+            return restaurant;
         }
     }
 }

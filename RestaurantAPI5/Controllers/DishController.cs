@@ -16,6 +16,13 @@ namespace RestaurantAPI5.Controllers
         }
         private readonly IDishService DishService;
 
+        [HttpDelete]
+        public ActionResult Delete([FromRoute] int restaurantId)
+        {
+            DishService.RemoveAll(restaurantId);
+
+            return NoContent();
+        }
 
         [HttpPost]
         public ActionResult Post([FromRoute]int restaurantId, [FromBody] CreateDishDto dto)
