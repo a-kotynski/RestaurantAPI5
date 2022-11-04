@@ -2,6 +2,7 @@
 using RestaurantAPI5.Models;
 using RestaurantAPI5.Services;
 using System;
+using System.Collections.Generic;
 
 namespace RestaurantAPI5.Controllers
 {
@@ -22,6 +23,20 @@ namespace RestaurantAPI5.Controllers
             var newDishId = DishService.Create(restaurantId, dto);
 
             return Created($"api/restaurant/{restaurantId}/dish/{newDishId}", null);
+        }
+
+        [HttpGet("{dishId}")]
+        public ActionResult<DishDto> Get([FromRoute] int restaurantId, [FromRoute] int dishId)
+        {
+            DishDto dish = DishService.GetById(restaurantId, dishId);
+            return Ok(dish);
+        }
+
+        [HttpGet]
+        public ActionResult<List<DishDto>> Get([FromRoute] int restaurantId)
+        {
+            var result = DishService.GetAll(restaurantId);
+            return Ok(result);
         }
     }
 }
