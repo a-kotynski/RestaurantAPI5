@@ -1,4 +1,6 @@
 using AutoMapper;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -10,6 +12,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using RestaurantAPI5.Entities;
 using RestaurantAPI5.Middleware;
+using RestaurantAPI5.Models;
+using RestaurantAPI5.Models.Validators;
 using RestaurantAPI5.Services;
 using System;
 using System.Collections.Generic;
@@ -32,7 +36,7 @@ namespace RestaurantAPI5
         {
             //services.AddSingleton<>(); // registering dependencies with AddSingleton<>() we're sure a certain dependecy has been created only once during 
             //services.AddScoped<>; //tl;dr: one request = one instance of a service // registering dependecies with different durations of objects; each object will be created anew for each requst sent by a client
-            services.AddControllers();
+            services.AddControllers().AddFluentValidation();
             services.AddDbContext<RestaurantDbContext>();
             services.AddScoped<RestaurantSeeder>();
             services.AddAutoMapper(this.GetType().Assembly);
@@ -41,6 +45,7 @@ namespace RestaurantAPI5
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<ErrorHandlingMiddleware>();
             services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+            services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();
 
             services.AddScoped<RequestTimeMiddleware>();
             services.AddSwaggerGen();
