@@ -22,6 +22,11 @@ namespace RestaurantAPI5.Middleware
             {
                 await next.Invoke(context); // if an exception occurs a catch block write that into our logger
             }
+            catch(BadRequestException badRequestException)
+            {
+                context.Response.StatusCode = 400;
+                await context.Response.WriteAsync(badRequestException.Message);
+            }
             catch (NotFoundException notFoundException)
             {
                 context.Response.StatusCode = 404;
