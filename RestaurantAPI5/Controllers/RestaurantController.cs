@@ -7,16 +7,16 @@ using RestaurantAPI5.Models;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using RestaurantAPI5.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RestaurantAPI5.Controllers
 {
     //mapping requests with specific paths:
     [Route("api/restaurant")]
     [ApiController]
+    [Authorize]
     public class RestaurantController : ControllerBase // ControllerBase allows access to request and answer context
     {
-
-
         public RestaurantController(IRestaurantService restaurantService)
         {
             RestaurantService = restaurantService;
@@ -41,6 +41,8 @@ namespace RestaurantAPI5.Controllers
 
 
         [HttpPost]
+        [Authorize(Roles = "Admin,Manager")]
+
         public ActionResult CreateRestaurant([FromBody] CreateRestaurantDto dto)
         {
             var id = RestaurantService.Create(dto);
@@ -60,6 +62,7 @@ namespace RestaurantAPI5.Controllers
 
 
         [HttpGet("{id}")] // it's a good practice to assign an action by Http attributes
+        [AllowAnonymous]
         public ActionResult<RestaurantDto> Get([FromRoute] int id)
         {
             var restaurant = RestaurantService.GetById(id);

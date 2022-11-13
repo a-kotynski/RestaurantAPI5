@@ -94,6 +94,7 @@ namespace RestaurantAPI5
             });
 
             app.UseRouting();
+            app.UseAuthorization();
 
             app.UseAuthorization();
 
