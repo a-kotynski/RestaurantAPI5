@@ -8,6 +8,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using RestaurantAPI5.Exceptions;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using RestaurantAPI5.Authorization;
 
 namespace RestaurantAPI5.Services
 {
@@ -17,27 +20,37 @@ namespace RestaurantAPI5.Services
     // * creating a new one based an object RestaurantDto
     public class RestaurantService : IRestaurantService
     {
-        public RestaurantService(RestaurantDbContext dbContext, IMapper mapper, ILogger<RestaurantService> logger)
+        public RestaurantService(RestaurantDbContext dbContext, IMapper mapper, ILogger<RestaurantService> logger, IAuthorizationService authorizationService)
         {
             DbContext = dbContext;
             Mapper = mapper;
             _logger = logger;
+            AuthorizationService = authorizationService;
         }
 
 
-        public RestaurantDbContext DbContext;
-        public IMapper Mapper;
-        public ILogger _logger;
+        private readonly RestaurantDbContext DbContext;
+        private readonly IMapper Mapper;
+        private readonly ILogger _logger;
 
+        public IAuthorizationService AuthorizationService { get; }
 
-        public void Update(int id, UpdateRestaurantDto dto)
+        public void Update(int id, UpdateRestaurantDto dto, ClaimsPrincipal user)
         {
+
             var restaurant = DbContext
                 .Restaurants
                 .FirstOrDefault(r => r.Id == id);
 
             if (restaurant is null)
                 throw new NotFoundException("Restaurant not found");
+
+            var authorizationResult = AuthorizationService.AuthorizeAsync(user, restaurant, new ResourceOperationRequirement(ResourceOperation.Update)).Result;
+
+            if (!authorizationResult.Succeeded)
+            {
+                throw new ForbidException();
+            }
 
             restaurant.Name = dto.Name;
             restaurant.Description = dto.Description;
@@ -46,7 +59,7 @@ namespace RestaurantAPI5.Services
             DbContext.SaveChanges();
         }
 
-        public void Delete(int id)
+        public void Delete(int id, ClaimsPrincipal user)
         {
             _logger.LogError($"Restaurant with id: {id} DELETE action invoked");
 
@@ -56,6 +69,14 @@ namespace RestaurantAPI5.Services
 
             if (restaurant is null)
                 throw new NotFoundException("Restaurant not found");
+
+            var authorizationResult = AuthorizationService.AuthorizeAsync(user, restaurant, new ResourceOperationRequirement(ResourceOperation.Delete)).Result;
+
+            if (!authorizationResult.Succeeded)
+            {
+                throw new ForbidException();
+            }
+
             DbContext.Restaurants.Remove(restaurant);
             DbContext.SaveChanges();
         }
@@ -89,9 +110,10 @@ namespace RestaurantAPI5.Services
         }
 
 
-        public int Create(CreateRestaurantDto dto)
+        public int Create(CreateRestaurantDto dto, int userId)
         {
             var restaurant = Mapper.Map<Restaurant>(dto);
+            restaurant.CreatedById = userId;
             DbContext.Restaurants.Add(restaurant);
             DbContext.SaveChanges();
 

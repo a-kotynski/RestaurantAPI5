@@ -8,6 +8,7 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using RestaurantAPI5.Services;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace RestaurantAPI5.Controllers
 {
@@ -27,7 +28,7 @@ namespace RestaurantAPI5.Controllers
         [HttpPut("{id}")]
         public ActionResult UpdateRestaurant([FromBody] UpdateRestaurantDto dto, [FromRoute]int id)
         {
-            RestaurantService.Update(id, dto);
+            RestaurantService.Update(id, dto, User);
             return Ok();
         }
 
@@ -35,7 +36,7 @@ namespace RestaurantAPI5.Controllers
         [HttpDelete("{id}")]
         public ActionResult Delete([FromRoute] int id)
         {
-            RestaurantService.Delete(id);
+            RestaurantService.Delete(id, User);
             return NoContent();
         }
 
@@ -45,7 +46,8 @@ namespace RestaurantAPI5.Controllers
 
         public ActionResult CreateRestaurant([FromBody] CreateRestaurantDto dto)
         {
-            var id = RestaurantService.Create(dto);
+            var userId = int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value);
+            var id = RestaurantService.Create(dto, userId);
             return Created($"/api/restaurant/{id}", null);
         }
 
