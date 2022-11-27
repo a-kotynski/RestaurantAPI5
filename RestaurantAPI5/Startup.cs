@@ -21,6 +21,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using RestaurantAPI5.Authorization;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RestaurantAPI5
 {
@@ -60,7 +62,10 @@ namespace RestaurantAPI5
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("HasNationality", builder => builder.RequireClaim("Nationality", "German", "Polish"));
+                options.AddPolicy("Atleast20", builder => builder.AddRequirements(new MinimumAgeRequirement(20)));
             });
+
+            services.AddScoped<IAuthorizationHandler, MinimumAgeRequirementHandler>();
             services.AddControllers().AddFluentValidation();
             services.AddDbContext<RestaurantDbContext>();
             services.AddScoped<RestaurantSeeder>();
