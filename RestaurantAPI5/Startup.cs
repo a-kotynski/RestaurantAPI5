@@ -80,6 +80,8 @@ namespace RestaurantAPI5
             services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();
 
             services.AddScoped<RequestTimeMiddleware>();
+            services.AddScoped<IUserContextService, UserContextService>();
+            services.AddHttpContextAccessor();
             services.AddSwaggerGen();
         }
 

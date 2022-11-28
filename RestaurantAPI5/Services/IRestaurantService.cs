@@ -6,10 +6,10 @@ namespace RestaurantAPI5.Services
 {
     public interface IRestaurantService
     {
-        void Update(int id, UpdateRestaurantDto dto, ClaimsPrincipal user);
-        int Create(CreateRestaurantDto dto, int userId);
+        void Update(int id, UpdateRestaurantDto dto);
+        int Create(CreateRestaurantDto dto);
         IEnumerable<RestaurantDto> GetAll();
         RestaurantDto GetById(int id);
-        void Delete(int id, ClaimsPrincipal user);
+        void Delete(int id);
     }
 }
