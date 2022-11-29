@@ -8,7 +8,7 @@ namespace RestaurantAPI5.Services
     {
         void Update(int id, UpdateRestaurantDto dto);
         int Create(CreateRestaurantDto dto);
-        IEnumerable<RestaurantDto> GetAll();
+        IEnumerable<RestaurantDto> GetAll(string searchPhrase);
         RestaurantDto GetById(int id);
         void Delete(int id);
     }
