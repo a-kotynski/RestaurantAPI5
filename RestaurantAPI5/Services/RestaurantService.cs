@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using RestaurantAPI5.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Linq.Expressions;
+using System;
 
 namespace RestaurantAPI5.Services
 {
@@ -107,6 +109,20 @@ namespace RestaurantAPI5.Services
                 .Include(r => r.Address)
                 .Include(r => r.Dishes)
                 .Where(r => query.SearchPhrase == null || (r.Name.ToLower().Contains(query.SearchPhrase.ToLower()) || r.Description.ToLower().Contains(query.SearchPhrase.ToLower())));
+
+            if (!string.IsNullOrEmpty(query.SortBy))
+            {
+                var columnsSelector = new Dictionary<string, Expression<Func<Restaurant, object>>>
+                {
+                    { nameof(Restaurant.Name), r => r.Name },
+                    { nameof(Restaurant.Description), r => r.Description },
+                    { nameof(Restaurant.Category), r => r.Description }
+                };
+
+                var selectedColumn = columnsSelector[query.SortBy];
+
+                baseQuery = query.SortDirection == SortDirection.ASC ? baseQuery.OrderBy(r => r.Name) : baseQuery.OrderByDescending(r => r.Category);
+            }
 
             var restaurants = baseQuery
                 .Skip(query.PageSize * (query.PageNumber - 1)) // pagination logic
