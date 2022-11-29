@@ -11,6 +11,7 @@ using RestaurantAPI5.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using RestaurantAPI5.Authorization;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace RestaurantAPI5.Services
 {
@@ -99,17 +100,26 @@ namespace RestaurantAPI5.Services
         }
 
 
-        public IEnumerable<RestaurantDto> GetAll(string searchPhrase)
+        public PagedResult<RestaurantDto> GetAll(RestaurantQuery query)
         {
-            var restaurants = DbContext
+            var baseQuery = DbContext
                 .Restaurants
                 .Include(r => r.Address)
                 .Include(r => r.Dishes)
-                .Where(r => searchPhrase == null || (r.Name.ToLower().Contains(searchPhrase.ToLower()) || r.Description.ToLower().Contains(searchPhrase.ToLower())))
+                .Where(r => query.SearchPhrase == null || (r.Name.ToLower().Contains(query.SearchPhrase.ToLower()) || r.Description.ToLower().Contains(query.SearchPhrase.ToLower())));
+
+            var restaurants = baseQuery
+                .Skip(query.PageSize * (query.PageNumber - 1)) // pagination logic
+                .Take(query.PageSize)
                 .ToList();
 
+            var totalItemsCount = baseQuery.Count();
+
             var restaurantsDtos = Mapper.Map<List<RestaurantDto>>(restaurants);
-            return restaurantsDtos;
+
+            var result = new PagedResult<RestaurantDto>(restaurantsDtos, totalItemsCount, query.PageSize, query.PageNumber);
+
+            return result;
         }
 
 
