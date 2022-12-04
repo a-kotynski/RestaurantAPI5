@@ -7,9 +7,11 @@ using System.IO;
 namespace RestaurantAPI5.Controllers
 {
     [Route("file")]
-    [Authorize]
+    //[Authorize]
     public class FileController : ControllerBase
     {
+        [HttpGet]
+        [ResponseCache(Duration = 1200, VaryByQueryKeys = new[] { "fileName" })]
         public ActionResult Getfile([FromQuery] string fileName) 
         {
             var rootPath = Directory.GetCurrentDirectory();
