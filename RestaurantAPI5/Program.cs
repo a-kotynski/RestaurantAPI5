@@ -13,6 +13,7 @@ using RestaurantAPI5;
 using System.Text;
 using FluentValidation.AspNetCore;
 using System.Reflection;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder();
 
@@ -54,7 +55,9 @@ builder.Services.AddScoped<IAuthorizationHandler, MinimumAgeRequirementHandler>(
 builder.Services.AddScoped<IAuthorizationHandler, ResourceOperationRequirementHandler>();
 
 builder.Services.AddControllers().AddFluentValidation();
-builder.Services.AddDbContext<RestaurantDbContext>();
+
+builder.Services.AddDbContext<RestaurantDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("RestaurantDbConnection")));
+
 builder.Services.AddScoped<RestaurantSeeder>();
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 builder.Services.AddScoped<IRestaurantService, RestaurantService>();

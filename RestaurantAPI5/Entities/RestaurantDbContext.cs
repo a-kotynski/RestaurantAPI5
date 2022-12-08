@@ -4,8 +4,10 @@ namespace RestaurantAPI5.Entities
 {
     public class RestaurantDbContext : DbContext
     {
-        private string _connectionString =
-            "Server=.\\SQLEXPRESS;Database=RestaurantDb;Trusted_Connection=True";
+        public RestaurantDbContext(DbContextOptions<RestaurantDbContext> options) : base(options)
+        {
+
+        }
         public DbSet<Restaurant> Restaurants { get; set; }
         public DbSet<Address> Addresses { get; set; }
         public DbSet<Dish> Dishes { get; set; }
@@ -40,11 +42,6 @@ namespace RestaurantAPI5.Entities
                 .Property(a => a.Street)
                 .IsRequired()
                 .HasMaxLength(50);
-        }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer(_connectionString);
         }
     }
 }
